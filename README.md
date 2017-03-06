@@ -9,6 +9,8 @@ This repository provides Julia implementations of the following Temporal-Differe
 - SARSA
 - SARSA lambda
 
+Note that these solvers are tabular, and will only work with MDPs that have discrete state and action spaces.
+
 ## Installation
 
 This package relies on [POMDPs.jl](https://github.com/JuliaPOMDP/POMDPs.jl). Using POMDPs.jl (should automatically take care of dependencies)
