@@ -19,9 +19,22 @@ import POMDPs
 POMDPs.add("TabularTDLearning")
 ```
 
-OR (some optional dependencies may be missing)
+## Example
+
+If you defined a generative model for your problem you can solve it as follows:
 
 ```julia
-Pkg.clone("https://github.com/JuliaPOMDP/TabularTDLearning.jl.git")
+using TabularTDLearning
+using POMDPModels
+
+mdp = GridWorld()
+# use Q-Learning
+solver = QLearningSolver(mdp, learning_rate=0.1, n_episodes=5000, max_episode_length=50, eval_every=50, n_eval_traj=100)
+policy = solve(solver, mdp)
+# Use SARSA
+solver = SARSASolver(mdp, learning_rate=0.1, n_episodes=5000, max_episode_length=50, eval_every=50, n_eval_traj=100)
+policy = solve(solver, mdp)
+
+
 ```
 
