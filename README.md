@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/JuliaPOMDP/TabularTDLearning.jl.svg?branch=master)](https://travis-ci.org/JuliaPOMDP/TabularTDLearning.jl)
 [![Coverage Status](https://coveralls.io/repos/JuliaPOMDP/TabularTDLearning.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/JuliaPOMDP/TabularTDLearning.jl?branch=master)
 
-This repository provides Julia implementations of the following Temporal-Difference algorithms:
+This repository provides Julia implementations of the following Temporal-Difference reinforcement learning algorithms:
 
 - Q-Learning
 - SARSA
