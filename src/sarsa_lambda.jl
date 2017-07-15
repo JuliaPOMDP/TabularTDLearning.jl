@@ -1,4 +1,4 @@
-type SARSALambdaSolver <: Solver
+mutable struct SARSALambdaSolver <: Solver
    n_episodes::Int64
    max_episode_length::Int64
    learning_rate::Float64
@@ -17,7 +17,7 @@ type SARSALambdaSolver <: Solver
                             exp_policy=EpsGreedyPolicy(mdp, 0.5),
                             eval_every=10,
                             n_eval_traj=20)
-    return new(n_episodes, max_episode_length, learning_rate, 
+    return new(n_episodes, max_episode_length, learning_rate,
                exp_policy, exp_policy.val.value_table,
                zeros(size(exp_policy.val.value_table)), lambda, eval_every, n_eval_traj)
     end
@@ -58,11 +58,11 @@ function solve(solver::SARSALambdaSolver, mdp::Union{MDP,POMDP}, policy=create_p
         end
         if i % solver.eval_every == 0
             r_tot = 0.0
-            for traj in 1:solver.n_eval_traj 
+            for traj in 1:solver.n_eval_traj
                 r_tot += simulate(sim, mdp, policy, initial_state(mdp, rng))
             end
             println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)")
         end
     end
-    return policy 
+    return policy
 end

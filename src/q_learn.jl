@@ -1,4 +1,4 @@
-type QLearningSolver <: Solver
+mutable struct QLearningSolver <: Solver
    n_episodes::Int64
    max_episode_length::Int64
    learning_rate::Float64
@@ -42,11 +42,11 @@ function solve(solver::QLearningSolver, mdp::Union{MDP,POMDP}, policy=create_pol
         end
         if i % solver.eval_every == 0
             r_tot = 0.0
-            for traj in 1:solver.n_eval_traj 
+            for traj in 1:solver.n_eval_traj
                 r_tot += simulate(sim, mdp, policy, initial_state(mdp, rng))
             end
             println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)")
         end
     end
-    return policy 
+    return policy
 end
