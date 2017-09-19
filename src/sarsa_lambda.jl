@@ -1,3 +1,33 @@
+"""
+    SARSALambdaSolver
+
+SARSA-λ implementation for tabular MDPs, assign credits using eligibility traces
+
+Parameters:
+- `mdp::Union{MDP, POMDP}`:
+    Your problem framed as an MDP or POMDP
+    (it will use the state and not the observation if the problem is a POMDP)
+- `n_episodes::Int64`:
+    Number of episodes to train the Q table
+    default: `100`
+- `max_episode_length::Int64`:
+    Maximum number of steps before the episode is ended
+    default: `100`
+- `learning_rate::Float64`:
+    Learning rate
+    defaul: `0.001`
+- `lambda::Float64`:
+    Exponential decay parameter for the eligibility traces
+    default: `0.5`
+- `exp_policy::Policy`:
+    Exploration policy to select the actions
+    default: `EpsGreedyPolicy(mdp, 0.5)`
+- `eval_every::Int64`:
+    Frequency at which to evaluate the trained policy
+    default: `10`
+- `n_eval_traj::Int64`:
+    Number of episodes to evaluate the policy
+"""
 mutable struct SARSALambdaSolver <: Solver
    n_episodes::Int64
    max_episode_length::Int64
