@@ -1,3 +1,4 @@
+#TODO add doc
 mutable struct QLearningSolver <: Solver
    n_episodes::Int64
    max_episode_length::Int64
@@ -18,12 +19,12 @@ mutable struct QLearningSolver <: Solver
     end
 end
 
-
 function create_policy(solver::QLearningSolver, mdp::Union{MDP,POMDP})
     return solver.exploration_policy.val
 end
 
-function solve(solver::QLearningSolver, mdp::Union{MDP,POMDP}, policy=create_policy(solver, mdp))
+#TODO add verbose
+function solve(solver::QLearningSolver, mdp::Union{MDP,POMDP}, policy=create_policy(solver, mdp); verbose=true)
     rng = solver.exploration_policy.uni.rng
     Q = solver.Q_vals
     exploration_policy = solver.exploration_policy
@@ -45,8 +46,21 @@ function solve(solver::QLearningSolver, mdp::Union{MDP,POMDP}, policy=create_pol
             for traj in 1:solver.n_eval_traj
                 r_tot += simulate(sim, mdp, policy, initial_state(mdp, rng))
             end
-            println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)")
+            verbose ? println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)") : nothing
         end
     end
     return policy
+end
+
+@POMDP_require solve(solver::QLearningSolver, problem::Union{MDP,POMDP}) begin
+    P = typeof(problem)
+    S = state_type(P)
+    A = action_type(P)
+    @req initial_state(::P, ::AbstractRNG)
+    @req generate_sr(::P, ::S, ::A, ::AbstractRNG)
+    @req state_index(::P, ::S)
+    @req n_states(::P)
+    @req n_actions(::P)
+    @req action_index(::P, ::A)
+    @req discount(::P)
 end

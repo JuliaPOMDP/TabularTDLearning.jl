@@ -52,3 +52,16 @@ function solve(solver::SARSASolver, mdp::Union{MDP,POMDP}, policy=create_policy(
     end
     return policy
 end
+
+@POMDP_require solve(solver::SARSASolver, problem::Union{MDP,POMDP}) begin
+    P = typeof(problem)
+    S = state_type(P)
+    A = action_type(P)
+    @req initial_state(::P, ::AbstractRNG)
+    @req generate_sr(::P, ::S, ::A, ::AbstractRNG)
+    @req state_index(::P, ::S)
+    @req n_states(::P)
+    @req n_actions(::P)
+    @req action_index(::P, ::A)
+    @req discount(::P)
+end
