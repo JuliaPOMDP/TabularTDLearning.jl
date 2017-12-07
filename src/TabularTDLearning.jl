@@ -1,7 +1,7 @@
 module TabularTDLearning
 
 using POMDPs
-# using GenerativeModels
+
 using POMDPToolbox
 
 import POMDPs: Solver, solve, Policy
