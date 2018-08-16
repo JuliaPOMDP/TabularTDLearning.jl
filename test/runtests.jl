@@ -1,7 +1,7 @@
 using TabularTDLearning
 using POMDPs
 using POMDPModels
-using Base.Test
+using Test
 
 mdp = GridWorld()
 

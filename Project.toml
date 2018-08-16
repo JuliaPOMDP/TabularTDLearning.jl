@@ -1,0 +1,16 @@
+name = "TabularTDLearning"
+uuid = "df77095f-98f0-51e5-a706-d0ff5a5ad33f"
+repo = "https://github.com/JuliaPOMDP/TabularTDLearning.jl"
+
+[deps]
+POMDPs = "a93abf59-7444-517b-a68a-c42f96afdd7d"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+POMDPPolicies = "fd2a78ec-a0b2-11e8-254f-71ff51514d6b"
+POMDPSimulators = "a011d688-a0b9-11e8-2c70-290aeeeab7c9"
+
+[extras]
+POMDPModels = "355abbd5-f08e-5560-ac9e-8b5f2592a0ca"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["POMDPModels", "Test"]
