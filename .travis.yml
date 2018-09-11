@@ -7,8 +7,8 @@ julia:
   - 1.0
 notifications:
   email: false
-script:
-  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia --project -e 'import Pkg; Pkg.build(); Pkg.test("TabularTDLearning"; coverage=true)'
+# script:
+#   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+#   - julia --project -e 'import Pkg; Pkg.build(); Pkg.test("TabularTDLearning"; coverage=true)'
 after_success:
-  - julia --project -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+  - julia -e 'import Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
