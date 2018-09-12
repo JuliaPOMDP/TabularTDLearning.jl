@@ -34,7 +34,7 @@ mutable struct SARSASolver <: Solver
    eval_every::Int64
    n_eval_traj::Int64
    function SARSASolver(mdp::Union{MDP,POMDP};
-                            rng=Base.GLOBAL_RNG,
+                            rng=Random.GLOBAL_RNG,
                             n_episodes=100,
                             max_episode_length=100,
                             learning_rate=0.001,
@@ -57,7 +57,7 @@ function solve(solver::SARSASolver, mdp::Union{MDP,POMDP}, policy=create_policy(
     sim = RolloutSimulator(rng=rng, max_steps=solver.max_episode_length)
 
     for i = 1:solver.n_episodes
-        s = initial_state(mdp, rng)
+        s = initialstate(mdp, rng)
         a = action(exploration_policy, s)
         t = 0
         while !isterminal(mdp, s) && t < solver.max_episode_length
@@ -72,7 +72,7 @@ function solve(solver::SARSASolver, mdp::Union{MDP,POMDP}, policy=create_policy(
         if i % solver.eval_every == 0
             r_tot = 0.0
             for traj in 1:solver.n_eval_traj
-                r_tot += simulate(sim, mdp, policy, initial_state(mdp, rng))
+                r_tot += simulate(sim, mdp, policy, initialstate(mdp, rng))
             end
             println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)")
         end
@@ -82,9 +82,9 @@ end
 
 @POMDP_require solve(solver::SARSASolver, problem::Union{MDP,POMDP}) begin
     P = typeof(problem)
-    S = state_type(P)
-    A = action_type(P)
-    @req initial_state(::P, ::AbstractRNG)
+    S = statetype(P)
+    A = actiontype(P)
+    @req initialstate(::P, ::AbstractRNG)
     @req generate_sr(::P, ::S, ::A, ::AbstractRNG)
     @req state_index(::P, ::S)
     @req n_states(::P)
