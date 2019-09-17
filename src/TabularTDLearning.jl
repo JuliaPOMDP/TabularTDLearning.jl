@@ -4,6 +4,7 @@ using POMDPs
 using Random
 using POMDPPolicies
 using POMDPSimulators
+using Parameters
 
 import POMDPs: Solver, solve, Policy
 

@@ -24,6 +24,9 @@ Parameters:
     default: `10`
 - `n_eval_traj::Int64`:
     Number of episodes to evaluate the policy
+- `verbose::Bool`:
+    print information during training
+    default: `true`
 """
 mutable struct QLearningSolver <: Solver
    n_episodes::Int64
@@ -33,6 +36,7 @@ mutable struct QLearningSolver <: Solver
    Q_vals::Matrix{Float64}
    eval_every::Int64
    n_eval_traj::Int64
+   verbose::Bool
    function QLearningSolver(mdp::Union{MDP,POMDP};
                             rng=Random.GLOBAL_RNG,
                             n_episodes=100,
@@ -40,28 +44,27 @@ mutable struct QLearningSolver <: Solver
                             learning_rate=0.001,
                             exp_policy=EpsGreedyPolicy(mdp, 0.5),
                             eval_every=10,
-                            n_eval_traj=20)
-    return new(n_episodes, max_episode_length, learning_rate, exp_policy, exp_policy.val.value_table, eval_every, n_eval_traj)
+                            n_eval_traj=20,
+                            verbose=true)
+    return new(n_episodes, max_episode_length, learning_rate, exp_policy, exp_policy.val.value_table, eval_every, n_eval_traj, verbose)
     end
 end
 
-function create_policy(solver::QLearningSolver, mdp::Union{MDP,POMDP})
-    return solver.exploration_policy.val
-end
-
 #TODO add verbose
-function solve(solver::QLearningSolver, mdp::Union{MDP,POMDP}, policy=create_policy(solver, mdp); verbose=true)
+function solve(solver::QLearningSolver, mdp::Union{MDP,POMDP})
     rng = solver.exploration_policy.uni.rng
     Q = solver.Q_vals
     exploration_policy = solver.exploration_policy
     sim = RolloutSimulator(rng=rng, max_steps=solver.max_episode_length)
+
+    policy = exploration_policy.val 
 
     for i = 1:solver.n_episodes
         s = initialstate(mdp, rng)
         t = 0
         while !isterminal(mdp, s) && t < solver.max_episode_length
             a = action(exploration_policy, s)
-            sp, r = gen(DBNOut(:sp, :r), mdp, s, a, rng)
+            sp, r = gen(DDNOut(:sp, :r), mdp, s, a, rng)
             si = stateindex(mdp, s)
             ai = actionindex(mdp, a)
             spi = stateindex(mdp, sp)
@@ -74,7 +77,7 @@ function solve(solver::QLearningSolver, mdp::Union{MDP,POMDP}, policy=create_pol
             for traj in 1:solver.n_eval_traj
                 r_tot += simulate(sim, mdp, policy, initialstate(mdp, rng))
             end
-            verbose ? println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)") : nothing
+            solver.verbose ? println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)") : nothing
         end
     end
     return policy
@@ -85,7 +88,7 @@ end
     S = statetype(P)
     A = actiontype(P)
     @req initialstate(::P, ::AbstractRNG)
-    @req generate_sr(::P, ::S, ::A, ::AbstractRNG)
+    @req gen(::DDNOut{(:sp, :r)}, ::P, ::S, ::A, ::AbstractRNG)
     @req state_index(::P, ::S)
     @req action_index(::P, ::A)
     @req discount(::P)

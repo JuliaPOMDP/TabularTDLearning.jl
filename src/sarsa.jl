@@ -24,6 +24,9 @@ Parameters:
     default: `10`
 - `n_eval_traj::Int64`:
     Number of episodes to evaluate the policy
+- `verbose::Bool`:
+    print information during training
+    default: `true`
 """
 mutable struct SARSASolver <: Solver
    n_episodes::Int64
@@ -33,6 +36,7 @@ mutable struct SARSASolver <: Solver
    Q_vals::Matrix{Float64}
    eval_every::Int64
    n_eval_traj::Int64
+   verbose::Bool
    function SARSASolver(mdp::Union{MDP,POMDP};
                             rng=Random.GLOBAL_RNG,
                             n_episodes=100,
@@ -40,8 +44,9 @@ mutable struct SARSASolver <: Solver
                             learning_rate=0.001,
                             exp_policy=EpsGreedyPolicy(mdp, 0.5),
                             eval_every=10,
-                            n_eval_traj=20)
-    return new(n_episodes, max_episode_length, learning_rate, exp_policy, exp_policy.val.value_table, eval_every, n_eval_traj)
+                            n_eval_traj=20,
+                            verbose = true)
+    return new(n_episodes, max_episode_length, learning_rate, exp_policy, exp_policy.val.value_table, eval_every, n_eval_traj, verbose)
     end
 end
 
@@ -61,10 +66,12 @@ function solve(solver::SARSASolver, mdp::Union{MDP,POMDP}, policy=create_policy(
         a = action(exploration_policy, s)
         t = 0
         while !isterminal(mdp, s) && t < solver.max_episode_length
-            sp, r = generate_sr(mdp, s, a, rng)
+            sp, r = gen(DDNOut(:sp, :r), mdp, s, a, rng)
             ap = action(exploration_policy, sp)
-            si = state_index(mdp, s); ai = action_index(mdp, a); spi = state_index(mdp, sp)
-            api = action_index(mdp, ap)
+            si = stateindex(mdp, s)
+            ai = actionindex(mdp, a)
+            spi = stateindex(mdp, sp)
+            api = actionindex(mdp, ap)
             Q[si, ai] += solver.learning_rate * (r + discount(mdp) * Q[spi, api] - Q[si,ai])
             s, a = sp, ap
             t += 1
@@ -74,7 +81,7 @@ function solve(solver::SARSASolver, mdp::Union{MDP,POMDP}, policy=create_policy(
             for traj in 1:solver.n_eval_traj
                 r_tot += simulate(sim, mdp, policy, initialstate(mdp, rng))
             end
-            println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)")
+            solver.verbose ? println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)") : nothing
         end
     end
     return policy
@@ -85,7 +92,7 @@ end
     S = statetype(P)
     A = actiontype(P)
     @req initialstate(::P, ::AbstractRNG)
-    @req generate_sr(::P, ::S, ::A, ::AbstractRNG)
+    @req gen(::DDNOut{(:sp, :r)}, ::P, ::S, ::A, ::AbstractRNG)
     @req state_index(::P, ::S)
     @req n_states(::P)
     @req n_actions(::P)
