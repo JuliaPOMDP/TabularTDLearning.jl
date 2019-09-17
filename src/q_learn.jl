@@ -61,8 +61,10 @@ function solve(solver::QLearningSolver, mdp::Union{MDP,POMDP}, policy=create_pol
         t = 0
         while !isterminal(mdp, s) && t < solver.max_episode_length
             a = action(exploration_policy, s)
-            sp, r = generate_sr(mdp, s, a, rng)
-            si = state_index(mdp, s); ai = action_index(mdp, a); spi = state_index(mdp, sp)
+            sp, r = gen(DBNOut(:sp, :r), mdp, s, a, rng)
+            si = stateindex(mdp, s)
+            ai = actionindex(mdp, a)
+            spi = stateindex(mdp, sp)
             Q[si, ai] += solver.learning_rate * (r + discount(mdp) * maximum(Q[spi, :]) - Q[si,ai])
             s = sp
             t += 1
@@ -85,8 +87,6 @@ end
     @req initialstate(::P, ::AbstractRNG)
     @req generate_sr(::P, ::S, ::A, ::AbstractRNG)
     @req state_index(::P, ::S)
-    @req n_states(::P)
-    @req n_actions(::P)
     @req action_index(::P, ::A)
     @req discount(::P)
 end

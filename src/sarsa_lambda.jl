@@ -70,15 +70,17 @@ function solve(solver::SARSALambdaSolver, mdp::Union{MDP,POMDP}, policy=create_p
         a = action(exploration_policy, s)
         t = 0
         while !isterminal(mdp, s) && t < solver.max_episode_length
-            sp, r = generate_sr(mdp, s, a, rng)
+            sp, r = gen(DBNOut(:sp, :r), mdp, s, a, rng)
             ap = action(exploration_policy, sp)
-            si = state_index(mdp, s); ai = action_index(mdp, a); spi = state_index(mdp, sp)
-            api = action_index(mdp, ap)
+            si = stateindex(mdp, s)
+            ai = actionindex(mdp, a)
+            spi = stateindex(mdp, sp)
+            api = actionindex(mdp, ap)
             delta = r + discount(mdp) * Q[spi,api] - Q[si,ai]
             ecounts[si,ai] += 1
             for es in states(mdp)
                 for ea in actions(mdp)
-                    esi, eai = state_index(mdp, es), action_index(mdp, ea)
+                    esi, eai = stateindex(mdp, es), actionindex(mdp, ea)
                     Q[esi,eai] += solver.learning_rate * delta * ecounts[esi,eai]
                     ecounts[esi,eai] *= discount(mdp) * solver.lambda
                 end
@@ -104,8 +106,6 @@ end
     @req initialstate(::P, ::AbstractRNG)
     @req generate_sr(::P, ::S, ::A, ::AbstractRNG)
     @req state_index(::P, ::S)
-    @req n_states(::P)
-    @req n_actions(::P)
     @req action_index(::P, ::A)
     @req discount(::P)
 end

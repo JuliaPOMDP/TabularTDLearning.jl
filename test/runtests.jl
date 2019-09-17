@@ -3,7 +3,7 @@ using POMDPs
 using POMDPModels
 using Test
 
-mdp = GridWorld()
+mdp = SimpleGridWorld()
 
 
 @testset "qlearning" begin
