@@ -65,7 +65,7 @@ function solve(solver::SARSALambdaSolver, mdp::MDP)
         Q = solver.Q_vals
     end
     if solver.eligibility === nothing
-        ecounts = similar(Q)
+        ecounts = zeros(length(states(mdp)), length(actions(mdp)))
     else
         ecounts = solver.eligibility
     end

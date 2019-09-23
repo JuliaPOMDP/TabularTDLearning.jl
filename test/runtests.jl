@@ -7,6 +7,7 @@ using Random
 using Test
 
 mdp = SimpleGridWorld()
+Random.seed!(1)
 
 
 @testset "qlearning" begin
