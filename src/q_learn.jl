@@ -4,9 +4,8 @@
 Vanilla Q learning implementation for tabular MDPs
 
 Parameters:
-- `mdp::Union{MDP, POMDP}`:
-    Your problem framed as an MDP or POMDP
-    (it will use the state and not the observation if the problem is a POMDP)
+- `exploration_policy::Union{EpsGreedyPolicy, CategoricalTabularPolicy}`:
+    Exploration policy to select the actions
 - `n_episodes::Int64`:
     Number of episodes to train the Q table
     default: `100`
@@ -16,14 +15,12 @@ Parameters:
 - `learning_rate::Float64`
     Learning rate
     defaul: `0.001`
-- `exp_policy::Policy`:
-    Exploration policy to select the actions
-    default: `EpsGreedyPolicy(mdp, 0.5)`
 - `eval_every::Int64`:
     Frequency at which to evaluate the trained policy
     default: `10`
 - `n_eval_traj::Int64`:
     Number of episodes to evaluate the policy
+- `rng::AbstractRNG` random number generator
 - `verbose::Bool`:
     print information during training
     default: `true`
@@ -32,32 +29,38 @@ mutable struct QLearningSolver <: Solver
    n_episodes::Int64
    max_episode_length::Int64
    learning_rate::Float64
-   exploration_policy::Policy
-   Q_vals::Matrix{Float64}
+   exploration_policy::Union{EpsGreedyPolicy, CategoricalTabularPolicy}
+   Q_vals::Union{Nothing, Matrix{Float64}}
    eval_every::Int64
    n_eval_traj::Int64
+   rng::AbstractRNG
    verbose::Bool
-   function QLearningSolver(mdp::Union{MDP,POMDP};
+   function QLearningSolver(exp_policy::Union{EpsGreedyPolicy, CategoricalTabularPolicy};
                             rng=Random.GLOBAL_RNG,
                             n_episodes=100,
+                            Q_vals = nothing,
                             max_episode_length=100,
                             learning_rate=0.001,
-                            exp_policy=EpsGreedyPolicy(mdp, 0.5),
                             eval_every=10,
                             n_eval_traj=20,
                             verbose=true)
-    return new(n_episodes, max_episode_length, learning_rate, exp_policy, exp_policy.val.value_table, eval_every, n_eval_traj, verbose)
+    return new(n_episodes, max_episode_length, learning_rate, exp_policy, Q_vals, eval_every, n_eval_traj, rng, verbose)
     end
 end
 
 #TODO add verbose
-function solve(solver::QLearningSolver, mdp::Union{MDP,POMDP})
-    rng = solver.exploration_policy.uni.rng
-    Q = solver.Q_vals
+function solve(solver::QLearningSolver, mdp::MDP)
+    rng = solver.rng
+    if solver.Q_vals === nothing
+        Q = zeros(length(states(mdp)), length(actions(mdp)))
+    else
+        Q = solver.Q_vals
+    end
     exploration_policy = solver.exploration_policy
     sim = RolloutSimulator(rng=rng, max_steps=solver.max_episode_length)
 
-    policy = exploration_policy.val 
+    policy = ValuePolicy(mdp, Q)
+    exploration_policy.val = policy
 
     for i = 1:solver.n_episodes
         s = initialstate(mdp, rng)
