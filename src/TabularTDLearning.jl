@@ -4,6 +4,7 @@ using POMDPs
 using Random
 using POMDPPolicies
 using POMDPSimulators
+using Parameters
 
 import POMDPs: Solver, solve, Policy
 
@@ -12,6 +13,8 @@ export
     SARSASolver,
     SARSALambdaSolver,
     solve
+
+
 include("q_learn.jl")
 include("sarsa.jl")
 include("sarsa_lambda.jl")
