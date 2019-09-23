@@ -11,7 +11,7 @@ mdp = SimpleGridWorld()
 
 @testset "qlearning" begin
     rng = MersenneTwister(1)
-    solver = QLearningSolver(EpsGreedyPolicy(mdp, 0.5), learning_rate=0.1, n_episodes=500, max_episode_length=50, eval_every=50, n_eval_traj=100, rng=rng)
+    solver = QLearningSolver(EpsGreedyPolicy(mdp, 0.5, rng=rng), learning_rate=0.1, n_episodes=500, max_episode_length=50, eval_every=50, n_eval_traj=100, rng=rng)
 
     println("Test QLearning requirements: ")
     @requirements_info solver mdp
@@ -22,7 +22,7 @@ end
 
 @testset "sarsa" begin
     rng = MersenneTwister(1)
-    solver = SARSASolver(EpsGreedyPolicy(mdp, 0.5), learning_rate=0.1, n_episodes=500, max_episode_length=50, eval_every=50, n_eval_traj=100, rng=rng)
+    solver = SARSASolver(EpsGreedyPolicy(mdp, 0.5, rng=rng), learning_rate=0.1, n_episodes=500, max_episode_length=50, eval_every=50, n_eval_traj=100, rng=rng)
 
     println("Test SARSA requirements: ")
     @requirements_info solver mdp
@@ -33,7 +33,7 @@ end
 
 @testset "sarsa λ" begin
     rng = MersenneTwister(1)
-    solver = SARSALambdaSolver(EpsGreedyPolicy(mdp, 0.5), learning_rate=0.1, lambda=0.9, n_episodes=500, max_episode_length=50, eval_every=50, n_eval_traj=100, rng=rng)
+    solver = SARSALambdaSolver(EpsGreedyPolicy(mdp, 0.5, rng=rng), learning_rate=0.1, lambda=0.9, n_episodes=500, max_episode_length=50, eval_every=50, n_eval_traj=100, rng=rng)
 
     println("Test SARSALambda requirements: ")
     @requirements_info solver mdp
