@@ -48,12 +48,7 @@ mutable struct SARSASolver <: Solver
     end
 end
 
-
-function create_policy(solver::SARSASolver, mdp::Union{MDP,POMDP})
-    return solver.exploration_policy.val
-end
-
-function solve(solver::SARSASolver, mdp::Union{MDP,POMDP}, policy=create_policy(solver, mdp))
+function solve(solver::SARSASolver, mdp::Union{MDP,POMDP})
     rng = solver.rng
     if solver.Q_vals === nothing
         Q = zeros(length(states(mdp)), length(actions(mdp)))
