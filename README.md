@@ -23,8 +23,6 @@ POMDPs.add("TabularTDLearning")
 
 ## Example
 
-If you defined a generative model for your problem using the interface from [GenerativeModels.jl](https://github.com/JuliaPOMDP/GenerativeModels.jl) you can solve it as follows:
-
 ```julia
 using TabularTDLearning
 using POMDPPolicies
