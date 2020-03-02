@@ -2,7 +2,7 @@ name = "TabularTDLearning"
 uuid = "df77095f-98f0-51e5-a706-d0ff5a5ad33f"
 license = "MIT"
 repo = "https://github.com/JuliaPOMDP/TabularTDLearning.jl"
-version = "0.3.0"
+version = "0.3.1"
 
 [deps]
 POMDPPolicies = "182e52fb-cfd0-5e46-8c26-fd0667c990f4"
@@ -13,6 +13,8 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
 POMDPs = "0.7.3, 0.8"
+POMDPPolicies= "0.2.1"
+julia = "1"
 
 [extras]
 POMDPModels = "355abbd5-f08e-5560-ac9e-8b5f2592a0ca"
