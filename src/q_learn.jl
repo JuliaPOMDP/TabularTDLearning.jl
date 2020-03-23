@@ -4,7 +4,7 @@
 Vanilla Q learning implementation for tabular MDPs
 
 Parameters:
-- `exploration_policy::Union{EpsGreedyPolicy, CategoricalTabularPolicy}`:
+- `exploration_policy::ExplorationPolicy`:
     Exploration policy to select the actions
 - `n_episodes::Int64`:
     Number of episodes to train the Q table
@@ -25,30 +25,18 @@ Parameters:
     print information during training
     default: `true`
 """
-mutable struct QLearningSolver <: Solver
-   n_episodes::Int64
-   max_episode_length::Int64
-   learning_rate::Float64
-   exploration_policy::Union{EpsGreedyPolicy, CategoricalTabularPolicy}
-   Q_vals::Union{Nothing, Matrix{Float64}}
-   eval_every::Int64
-   n_eval_traj::Int64
-   rng::AbstractRNG
-   verbose::Bool
-   function QLearningSolver(exp_policy::Union{EpsGreedyPolicy, CategoricalTabularPolicy};
-                            rng=Random.GLOBAL_RNG,
-                            n_episodes=100,
-                            Q_vals = nothing,
-                            max_episode_length=100,
-                            learning_rate=0.001,
-                            eval_every=10,
-                            n_eval_traj=20,
-                            verbose=true)
-    return new(n_episodes, max_episode_length, learning_rate, exp_policy, Q_vals, eval_every, n_eval_traj, rng, verbose)
-    end
+@with_kw mutable struct QLearningSolver{E<:ExplorationPolicy} <: Solver
+   n_episodes::Int64 = 100
+   max_episode_length::Int64 = 100
+   learning_rate::Float64 = 0.001
+   exploration_policy::E
+   Q_vals::Union{Nothing, Matrix{Float64}} = nothing
+   eval_every::Int64 = 10
+   n_eval_traj::Int64 = 20
+   rng::AbstractRNG = Random.GLOBAL_RNG
+   verbose::Bool = true
 end
 
-#TODO add verbose
 function solve(solver::QLearningSolver, mdp::MDP)
     rng = solver.rng
     if solver.Q_vals === nothing
@@ -59,14 +47,14 @@ function solve(solver::QLearningSolver, mdp::MDP)
     exploration_policy = solver.exploration_policy
     sim = RolloutSimulator(rng=rng, max_steps=solver.max_episode_length)
 
-    policy = ValuePolicy(mdp, Q)
-    exploration_policy.val = policy
-
+    on_policy = ValuePolicy(mdp, Q)
+    k = 0
     for i = 1:solver.n_episodes
         s = initialstate(mdp, rng)
         t = 0
         while !isterminal(mdp, s) && t < solver.max_episode_length
-            a = action(exploration_policy, s)
+            a = action(exploration_policy, on_policy, k, s)
+            k += 1
             sp, r = gen(DDNOut(:sp, :r), mdp, s, a, rng)
             si = stateindex(mdp, s)
             ai = actionindex(mdp, a)
@@ -78,12 +66,12 @@ function solve(solver::QLearningSolver, mdp::MDP)
         if i % solver.eval_every == 0
             r_tot = 0.0
             for traj in 1:solver.n_eval_traj
-                r_tot += simulate(sim, mdp, policy, initialstate(mdp, rng))
+                r_tot += simulate(sim, mdp, on_policy, initialstate(mdp, rng))
             end
             solver.verbose ? println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)") : nothing
         end
     end
-    return policy
+    return on_policy
 end
 
 @POMDP_require solve(solver::QLearningSolver, problem::Union{MDP,POMDP}) begin
