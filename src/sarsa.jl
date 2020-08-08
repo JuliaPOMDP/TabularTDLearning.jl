@@ -50,11 +50,11 @@ function solve(solver::SARSASolver, mdp::Union{MDP,POMDP})
     on_policy = ValuePolicy(mdp, Q)
     k = 0 # step counter
     for i = 1:solver.n_episodes
-        s = initialstate(mdp, rng)
+        s = rand(rng, initialstate(mdp))
         a = action(exploration_policy, on_policy, k, s)
         t = 0
         while !isterminal(mdp, s) && t < solver.max_episode_length
-            sp, r = gen(DDNOut(:sp, :r), mdp, s, a, rng)
+            sp, r = @gen(:sp, :r)(mdp, s, a, rng)
             k += 1
             ap = action(exploration_policy, on_policy, k, sp)
             si = stateindex(mdp, s)
@@ -68,7 +68,7 @@ function solve(solver::SARSASolver, mdp::Union{MDP,POMDP})
         if i % solver.eval_every == 0
             r_tot = 0.0
             for traj in 1:solver.n_eval_traj
-                r_tot += simulate(sim, mdp, on_policy, initialstate(mdp, rng))
+                r_tot += simulate(sim, mdp, on_policy, rand(rng, initialstate(mdp)))
             end
             solver.verbose ? println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)") : nothing
         end
@@ -76,7 +76,7 @@ function solve(solver::SARSASolver, mdp::Union{MDP,POMDP})
     return on_policy
 end
 
-@POMDP_require solve(solver::SARSASolver, problem::Union{MDP,POMDP}) begin
+POMDPLinter.@POMDP_require solve(solver::SARSASolver, problem::Union{MDP,POMDP}) begin
     P = typeof(problem)
     S = statetype(P)
     A = actiontype(P)
