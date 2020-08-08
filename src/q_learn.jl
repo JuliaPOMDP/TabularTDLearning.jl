@@ -50,12 +50,12 @@ function solve(solver::QLearningSolver, mdp::MDP)
     on_policy = ValuePolicy(mdp, Q)
     k = 0
     for i = 1:solver.n_episodes
-        s = initialstate(mdp, rng)
+        s = rand(rng, initialstate(mdp))
         t = 0
         while !isterminal(mdp, s) && t < solver.max_episode_length
             a = action(exploration_policy, on_policy, k, s)
             k += 1
-            sp, r = gen(DDNOut(:sp, :r), mdp, s, a, rng)
+            sp, r = @gen(:sp, :r)(mdp, s, a, rng)
             si = stateindex(mdp, s)
             ai = actionindex(mdp, a)
             spi = stateindex(mdp, sp)
@@ -66,7 +66,7 @@ function solve(solver::QLearningSolver, mdp::MDP)
         if i % solver.eval_every == 0
             r_tot = 0.0
             for traj in 1:solver.n_eval_traj
-                r_tot += simulate(sim, mdp, on_policy, initialstate(mdp, rng))
+                r_tot += simulate(sim, mdp, on_policy, rand(rng, initialstate(mdp)))
             end
             solver.verbose ? println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)") : nothing
         end
@@ -74,7 +74,7 @@ function solve(solver::QLearningSolver, mdp::MDP)
     return on_policy
 end
 
-@POMDP_require solve(solver::QLearningSolver, problem::Union{MDP,POMDP}) begin
+POMDPLinter.@POMDP_require solve(solver::QLearningSolver, problem::Union{MDP,POMDP}) begin
     P = typeof(problem)
     S = statetype(P)
     A = actiontype(P)
