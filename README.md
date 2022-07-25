@@ -25,8 +25,8 @@ POMDPs.add("TabularTDLearning")
 
 ```julia
 using TabularTDLearning
-using POMDPPolicies
 using POMDPModels
+using POMDPTools
 
 mdp = GridWorld()
 # use Q-Learning

@@ -1,8 +1,7 @@
 using TabularTDLearning
 using POMDPs
 using POMDPModels
-using POMDPPolicies
-using POMDPTesting
+using POMDPTools
 using Random
 using Test
 import POMDPLinter: @show_requirements

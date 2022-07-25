@@ -2,8 +2,7 @@ module TabularTDLearning
 
 using POMDPs
 using POMDPLinter
-using POMDPPolicies
-using POMDPSimulators
+using POMDPTools
 using Parameters
 using Random
 
