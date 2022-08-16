@@ -1,7 +1,7 @@
 # TabularTDLearning
 
-[![Build Status](https://travis-ci.org/JuliaPOMDP/TabularTDLearning.jl.svg?branch=master)](https://travis-ci.org/JuliaPOMDP/TabularTDLearning.jl)
-[![Coverage Status](https://coveralls.io/repos/JuliaPOMDP/TabularTDLearning.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/JuliaPOMDP/TabularTDLearning.jl?branch=master)
+[![CI](https://github.com/JuliaPOMDP/TabularTDLearning.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaPOMDP/TabularTDLearning.jl/actions/workflows/CI.yml)
+[![codecov](https://codecov.io/gh/JuliaPOMDP/TabularTDLearning.jl/branch/master/graph/badge.svg?token=vuJ6Ax5SQj)](https://codecov.io/gh/JuliaPOMDP/TabularTDLearning.jl)
 
 This repository provides Julia implementations of the following Temporal-Difference reinforcement learning algorithms:
 
