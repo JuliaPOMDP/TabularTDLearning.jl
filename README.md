@@ -13,17 +13,14 @@ Note that these solvers are tabular, and will only work with MDPs that have disc
 
 ## Installation
 
-This package relies on [POMDPs.jl](https://github.com/JuliaPOMDP/POMDPs.jl). Using POMDPs.jl (should automatically take care of dependencies)
-
 ```julia
-Pkg.add("POMDPs")
-import POMDPs
-POMDPs.add("TabularTDLearning")
+Pkg.add("TabularTDLearning")
 ```
 
 ## Example
 
 ```julia
+using POMDPs
 using TabularTDLearning
 using POMDPModels
 using POMDPTools
