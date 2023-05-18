@@ -25,7 +25,7 @@ Parameters:
     print information during training
     default: `true`
 """
-Base.@kwdef mutable struct SARSASolver{E<:ExplorationPolicy} <: Solver
+Base.@kwdef mutable struct SARSASolver{E<:ExplorationPolicy, RNG<:AbstractRNG} <: Solver
    n_episodes::Int64 = 100
    max_episode_length::Int64 = 100
    learning_rate::Float64 = 0.001
@@ -33,18 +33,18 @@ Base.@kwdef mutable struct SARSASolver{E<:ExplorationPolicy} <: Solver
    Q_vals::Union{Nothing, Matrix{Float64}} = nothing
    eval_every::Int64 = 10
    n_eval_traj::Int64 = 20
-   rng::AbstractRNG = Random.GLOBAL_RNG
+   rng::RNG = Random.GLOBAL_RNG
    verbose::Bool = true
 end
 
 function solve(solver::SARSASolver, mdp::Union{MDP,POMDP})
-    rng = solver.rng
-    if solver.Q_vals === nothing
-        Q = zeros(length(states(mdp)), length(actions(mdp)))
+    (;rng, exploration_policy) = solver
+    Q = if isnothing(solver.Q_vals)
+        zeros(length(states(mdp)), length(actions(mdp)))
     else
-        Q = solver.Q_vals
-    end
-    exploration_policy = solver.exploration_policy
+        solver.Q_vals
+    end::Matrix{Float64}
+
     sim = RolloutSimulator(rng=rng, max_steps=solver.max_episode_length)
 
     on_policy = ValuePolicy(mdp, Q)
@@ -70,7 +70,7 @@ function solve(solver::SARSASolver, mdp::Union{MDP,POMDP})
             for traj in 1:solver.n_eval_traj
                 r_tot += simulate(sim, mdp, on_policy, rand(rng, initialstate(mdp)))
             end
-            solver.verbose ? println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)") : nothing
+            solver.verbose && println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)")
         end
     end
     return on_policy

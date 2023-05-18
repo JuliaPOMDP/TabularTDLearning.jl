@@ -28,7 +28,7 @@ Parameters:
     print information during training
     default: `true`
 """
-Base.@kwdef mutable struct SARSALambdaSolver{E<:ExplorationPolicy} <: Solver
+Base.@kwdef mutable struct SARSALambdaSolver{E<:ExplorationPolicy, RNG<:AbstractRNG} <: Solver
    n_episodes::Int64 = 100
    max_episode_length::Int64 = 100
    learning_rate::Float64 = 0.001
@@ -38,23 +38,24 @@ Base.@kwdef mutable struct SARSALambdaSolver{E<:ExplorationPolicy} <: Solver
    lambda::Float64 = 0.5
    eval_every::Int64 = 10 
    n_eval_traj::Int64 = 20
-   rng::AbstractRNG = Random.GLOBAL_RNG
+   rng::RNG = Random.GLOBAL_RNG
    verbose::Bool = true
 end
 
 function solve(solver::SARSALambdaSolver, mdp::MDP)
-    rng = solver.rng
-    if solver.Q_vals === nothing
-        Q = zeros(length(states(mdp)), length(actions(mdp)))
+    (;rng, exploration_policy) = solver
+    Q = if isnothing(solver.Q_vals)
+        zeros(length(states(mdp)), length(actions(mdp)))
     else
-        Q = solver.Q_vals
-    end
-    if solver.eligibility === nothing
-        ecounts = zeros(length(states(mdp)), length(actions(mdp)))
+        solver.Q_vals
+    end::Matrix{Float64}
+
+    ecounts = if isnothing(solver.eligibility)
+        zeros(length(states(mdp)), length(actions(mdp)))
     else
-        ecounts = solver.eligibility
-    end
-    exploration_policy = solver.exploration_policy
+        solver.eligibility
+    end::Matrix{Float64}
+
     on_policy = ValuePolicy(mdp, Q)
     sim = RolloutSimulator(rng=rng, max_steps=solver.max_episode_length)
     k = 0
@@ -87,7 +88,7 @@ function solve(solver::SARSALambdaSolver, mdp::MDP)
             for traj in 1:solver.n_eval_traj
                 r_tot += simulate(sim, mdp, on_policy, rand(rng, initialstate(mdp)))
             end
-            solver.verbose ? println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)") : nothing
+            solver.verbose && println("On Iteration $i, Returns: $(r_tot/solver.n_eval_traj)")
         end
     end
     return on_policy
