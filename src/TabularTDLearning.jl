@@ -3,7 +3,6 @@ module TabularTDLearning
 using POMDPs
 using POMDPLinter
 using POMDPTools
-using Parameters
 using Random
 
 import POMDPs: Solver, solve, Policy

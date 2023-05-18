@@ -25,7 +25,7 @@ Parameters:
     print information during training
     default: `true`
 """
-@with_kw mutable struct SARSASolver{E<:ExplorationPolicy} <: Solver
+Base.@kwdef mutable struct SARSASolver{E<:ExplorationPolicy} <: Solver
    n_episodes::Int64 = 100
    max_episode_length::Int64 = 100
    learning_rate::Float64 = 0.001
