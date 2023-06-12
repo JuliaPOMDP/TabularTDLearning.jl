@@ -14,7 +14,7 @@ Parameters:
     default: `100`
 - `learning_rate::Float64`:
     Learning rate
-    defaul: `0.001`
+    default: `0.001`
 - `lambda::Float64`:
     Exponential decay parameter for the eligibility traces
     default: `0.5`
@@ -38,7 +38,7 @@ Base.@kwdef mutable struct SARSALambdaSolver{E<:ExplorationPolicy, RNG<:Abstract
    lambda::Float64 = 0.5
    eval_every::Int64 = 10 
    n_eval_traj::Int64 = 20
-   rng::RNG = Random.GLOBAL_RNG
+   rng::RNG = Random.default_rng()
    verbose::Bool = true
 end
 
