@@ -14,7 +14,7 @@ Parameters:
     default: `100`
 - `learning_rate::Float64`
     Learning rate
-    defaul: `0.001`
+    default: `0.001`
 - `eval_every::Int64`:
     Frequency at which to evaluate the trained policy
     default: `10`
@@ -33,7 +33,7 @@ Base.@kwdef mutable struct SARSASolver{E<:ExplorationPolicy, RNG<:AbstractRNG} <
    Q_vals::Union{Nothing, Matrix{Float64}} = nothing
    eval_every::Int64 = 10
    n_eval_traj::Int64 = 20
-   rng::RNG = Random.GLOBAL_RNG
+   rng::RNG = Random.default_rng()
    verbose::Bool = true
 end
 
