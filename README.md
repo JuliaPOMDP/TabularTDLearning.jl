@@ -8,6 +8,7 @@ This repository provides Julia implementations of the following Temporal-Differe
 - Q-Learning
 - SARSA
 - SARSA lambda
+- Prioritized Sweeping
 
 Note that these solvers are tabular, and will only work with MDPs that have discrete state and action spaces.
 
