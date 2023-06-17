@@ -18,7 +18,6 @@ Random.seed!(1)
     @show_requirements solve(solver, mdp)
 
     r = test_solver(solver, mdp, max_steps = 100)
-    @show r
     @test r > 0.0
 end
 
@@ -30,7 +29,6 @@ end
     @show_requirements solve(solver, mdp)
 
     r = test_solver(solver, mdp, max_steps = 100)
-    @show r
     @test r > 0.0
 end
 
@@ -42,7 +40,6 @@ end
     @show_requirements solve(solver, mdp)
 
     r = test_solver(solver, mdp, max_steps = 100)
-    @show r
     @test r > 0.0
 end
 
@@ -54,6 +51,5 @@ end
     @show_requirements solve(solver, sgw_mdp)
 
     r = test_solver(solver, sgw_mdp, max_steps = 100)
-    @show r
     @test r > 0.0
 end
