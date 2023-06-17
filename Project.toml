@@ -2,7 +2,7 @@ name = "TabularTDLearning"
 uuid = "df77095f-98f0-51e5-a706-d0ff5a5ad33f"
 license = "MIT"
 repo = "https://github.com/JuliaPOMDP/TabularTDLearning.jl"
-version = "0.5.0"
+version = "0.4.4"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
