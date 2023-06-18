@@ -37,6 +37,9 @@ policy = solve(solver, mdp)
 # Use SARSA lambda
 solver = SARSALambdaSolver(exploration_policy=exppolicy, learning_rate=0.1, lambda=0.9, n_episodes=5000, max_episode_length=50, eval_every=50, n_eval_traj=100)
 policy = solve(solver, mdp)
-
+# Use Prioritized Sweeping
+mdp_ps = SimpleGridWorld(tprob=1.0)
+solver = PrioritizedSweepingSolver(exploration_policy=exppolicy, learning_rate=0.1, n_episodes=5000, max_episode_length=50, eval_every=50, n_eval_traj=100,pq_threshold=0.5)
+policy = solve(solver,mdp_ps)
 ```
 
